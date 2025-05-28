@@ -1,38 +1,34 @@
 document.querySelectorAll('.filter-buttons').forEach(group => {
     const buttons = group.querySelectorAll('button');
     const selectAllButton = group.querySelector('.select-all');
+    const otherButtons = Array.from(buttons).filter(btn => !btn.classList.contains('select-all'));
 
-        // 處理「全部」按鈕
-        selectAllButton.addEventListener('click', () => {
-            const isSelectAllActive = selectAllButton.classList.contains('active');
-            if (isSelectAllActive) {
-                // 取消所有選中
-                buttons.forEach(btn => btn.classList.remove('active'));
-            } else {
-                // 全部選中
-                buttons.forEach(btn => btn.classList.add('active'));
+    // 點擊「全部」
+    selectAllButton.addEventListener('click', () => {
+        buttons.forEach(btn => btn.classList.remove('active'));
+        selectAllButton.classList.add('active');
+    });
+
+    // 點擊其他選項
+    otherButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            button.classList.toggle('active');
+            selectAllButton.classList.remove('active');
+
+            // 如果所有其他選項都亮，則只亮「全部」
+            const allActive = otherButtons.every(btn => btn.classList.contains('active'));
+            if (allActive) {
+                otherButtons.forEach(btn => btn.classList.remove('active'));
+                selectAllButton.classList.add('active');
+                return;
+            }
+
+            // 如果所有按鈕都沒亮，則只亮「全部」
+            const noneActive = otherButtons.every(btn => !btn.classList.contains('active'));
+            if (noneActive) {
+                selectAllButton.classList.add('active');
             }
         });
-
-        // 處理其他按鈕的多選
-        buttons.forEach(button => {
-            if (!button.classList.contains('select-all')) {
-                button.addEventListener('click', () => {
-                    button.classList.toggle('active'); // 切換選中狀態
-
-                    // 檢查是否所有按鈕（除了「全部」）都被選中
-                    const allSelected = Array.from(buttons)
-                        .filter(btn => !btn.classList.contains('select-all'))
-                        .every(btn => btn.classList.contains('active'));
-
-                    // 如果所有按鈕都被選中，「全部」也高亮；否則取消高亮
-                    if (allSelected) {
-                        selectAllButton.classList.add('active');
-                    } else {
-                        selectAllButton.classList.remove('active');
-                    }
-                });
-            }
-        });
-    })
+    });
+});
 
